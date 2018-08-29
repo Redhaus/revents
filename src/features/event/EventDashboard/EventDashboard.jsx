@@ -8,7 +8,7 @@ const eventsDashboard = [
   {
     id: "1",
     title: "Trip to Tower of London",
-    date: "2018-03-27T11:00:00+00:00",
+    date: "2018-03-06",
     category: "culture",
     description:
       "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus sollicitudin ligula eu leo tincidunt, quis scelerisque magna dapibus. Sed eget ipsum vel arcu vehicula ullamcorper.",
@@ -32,7 +32,7 @@ const eventsDashboard = [
   {
     id: "2",
     title: "Trip to Punch and Judy Pub",
-    date: "2018-03-28T14:00:00+00:00",
+    date: "2018-05-02",
     category: "drinks",
     description:
       "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus sollicitudin ligula eu leo tincidunt, quis scelerisque magna dapibus. Sed eget ipsum vel arcu vehicula ullamcorper.",
@@ -60,12 +60,43 @@ class EventDashboard extends Component {
 
   state = {
     events: eventsDashboard,
-    isOpen: false
+    isOpen: false,
+    selectedEvent: null
   };
 
+  handleUpdateEvent = (updatedEvent) => {
+    this.setState({
+
+      // find event passing in via its id and update that event to the one passed in
+      // So not to mutate state Object.assign place updatedEvent into empty Object and assigns it to cloned event
+      // Basically it replaces the old object with the new one.
+      events: this.state.events.map(event => {
+        if (event.id === updatedEvent.id){
+          return Object.assign({}, updatedEvent);
+        }else{
+          return event;
+        }
+      }), 
+      isOpen: false,
+      selectedEvent: null
+    })
+  }
+
+
+  //if not passing parms via another function you need another 
+  // arrow function so you can pass params via onClick or other event
+  handleOpenEvent = (eventToOpen) => () => {
+    console.log(eventToOpen)
+    this.setState({
+      selectedEvent: eventToOpen,
+      isOpen: true
+    })
+  }
+  
  
   handleFormOpen = () => {
     this.setState({
+      selectedEvent: null,
       isOpen: true
     })
   }
@@ -88,18 +119,28 @@ class EventDashboard extends Component {
     })
   }
 
+  handleDeleteEvent = (eventId) => () => {
+    // updatedEvents will be the filtered array minus the deleted eventId
+    const updatedEvents = this.state.events.filter(e => e.id !== eventId)
+    this.setState({
+      events: updatedEvents
+    })
+  } 
+
 
 
   render() {
+
+    const {selectedEvent} = this.state
     return (
       <Grid>
         <Grid.Column width={10}>
-          <EventList events={this.state.events} />
+          <EventList deleteEvent={this.handleDeleteEvent} onEventOpen={this.handleOpenEvent} events={this.state.events} />
         </Grid.Column>
 
         <Grid.Column width={6}>
           <Button onClick={this.handleFormOpen} positive content="Create Event" />
-          {this.state.isOpen && <EventForm createEvent={this.handleCreateEvent} handleCancel={this.handleCancel}/>}
+          {this.state.isOpen && <EventForm updateEvent={this.handleUpdateEvent} selectedEvent={selectedEvent} createEvent={this.handleCreateEvent} handleCancel={this.handleCancel}/>}
         </Grid.Column>
       </Grid>
     );
