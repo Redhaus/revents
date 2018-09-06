@@ -72,7 +72,7 @@ class EventDashboard extends Component {
       // Basically it replaces the old object with the new one.
       events: this.state.events.map(event => {
         if (event.id === updatedEvent.id){
-          return Object.assign({}, updatedEvent);
+          return  Object.assign({}, updatedEvent);
         }else{
           return event;
         }
